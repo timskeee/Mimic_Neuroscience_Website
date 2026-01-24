@@ -1,0 +1,260 @@
+/* --- 1. Global Reset & Root Variables --- */
+:root {
+  --bg: #000000;
+  --card: #050505;
+  --header-bg: #0b0f14;
+  --muted: #9aa4b2;
+  --accent: #6ee7b7;
+  --text: #e6eef6;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  overflow-x: hidden; /* Critical: prevents horizontal scroll drift */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- 2. Layout Containers --- */
+#__next, .app, .content {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- 3. Hero Section --- */
+.full-bleed-hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.full-bleed-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.5);
+  pointer-events: none;
+}
+
+.hero-center {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 15vh;
+  text-align: center;
+  z-index: 1;
+}
+
+.hero-center h1 {
+  font-size: clamp(2.5rem, 8vw, 5rem);
+  margin-bottom: 0.2em;
+}
+
+.hero-center .brand-logo {
+  height: clamp(50px, 10vw, 120px);
+  margin-bottom: 20px;
+}
+
+/* --- 4. Transitioning Sections --- */
+.below-hero, .second-section {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 2;
+  padding: 40px 20px;
+}
+
+.below-hero {
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(.4,0,.2,1);
+}
+
+.below-hero.reveal {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.second-section {
+  background: #111; /* Slightly lighter for separation */
+  z-index: 3;
+}
+
+/* --- 5. Components & UI --- */
+.blurb {
+  background: rgba(20, 20, 20, 0.7);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 700px;
+  text-align: center;
+  box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+}
+
+.actions {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.btn {
+  background: var(--accent);
+  color: #062018;
+  padding: 12px 24px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--text);
+  color: var(--text);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* --- 6. Hamburger Menu --- */
+.hamburger-menu {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9999;
+}
+
+.hamburger-btn {
+  background: rgba(20, 20, 20, 0.8);
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Hamburger icon (three bars) */
+.hamburger {
+  display: inline-block;
+  width: 32px;
+  height: 24px;
+  position: relative;
+}
+.hamburger span {
+  display: block;
+  height: 4px;
+  width: 100%;
+  background: var(--text);
+  border-radius: 2px;
+  position: absolute;
+  left: 0;
+  transition: 0.3s;
+}
+.hamburger span:nth-child(1) { top: 0; }
+.hamburger span:nth-child(2) { top: 10px; }
+.hamburger span:nth-child(3) { top: 20px; }
+.hamburger.active span:nth-child(1) {
+  top: 10px;
+  transform: rotate(45deg);
+}
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+}
+.hamburger.active span:nth-child(3) {
+  top: 10px;
+  transform: rotate(-45deg);
+}
+
+/* Dropdown menu overlay */
+.dropdown-menu {
+  position: fixed;
+  top: 60px;
+  left: 20px;
+  min-width: 220px;
+  background: rgba(20, 20, 20, 0.92);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.22);
+  padding: 24px 20px 18px 20px;
+  z-index: 1000;
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.32s, transform 0.32s;
+}
+.dropdown-animate-in {
+  animation: dropdownSlideDown 0.32s cubic-bezier(.4,0,.2,1);
+}
+.dropdown-animate-out {
+  animation: dropdownSlideUp 0.32s cubic-bezier(.4,0,.2,1);
+  opacity: 0 !important;
+  transform: translateY(-32px) !important;
+}
+@keyframes dropdownSlideDown {
+  from { opacity: 0; transform: translateY(-32px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dropdownSlideUp {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(-32px); }
+}
+.dropdown-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 700;
+  font-size: 1.6rem;
+  margin-bottom: 18px;
+  color: var(--text);
+}
+.dropdown-brand .brand-logo {
+  height: 32px;
+  width: auto;
+  display: inline-block;
+}
+.dropdown-menu nav {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.dropdown-menu nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 1.75rem;
+  padding: 10px 0;
+  border-radius: 4px;
+  transition: background 0.18s, color 0.18s;
+}
+
+.dropdown-menu nav a:hover {
+  color: var(--accent);
+  background: rgba(255,255,255,0.04);
+}
+
+.site-footer {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
