@@ -1,101 +1,123 @@
 window.neuronSketch = (p) => {
-  // --- Color Variables ---
-  let wtTraceColor = [200, 200, 200];      
-  let mutTraceColor = [255, 0, 0];       
-  let timeAxisColor = [255, 255, 255, 100]; 
-
-  let V_wt = -70, n_wt = 0.3177, m_wt = 0.0529, h_wt = 0.5961; 
-  let prevY_wt = 0;
-
-  let V_mut = -70, n_mut = 0.3177, m_mut = 0.0529, h_mut = 0.5961;
-  let prevY_mut = 0;
+  // ==========================================
+  // --- CONTROL PANEL ---
+  // ==========================================
+  const ANIMATION_SPEED = 0.5;   // LOWER = Slower drawing; HIGHER = Faster drawing
+  const TIME_WINDOW_MS  = 200;   // Always spans the full 1400px
+  const CANVAS_WIDTH    = 1400;
+  const CANVAS_HEIGHT   = 800;
   
-  // Visibility Threshold: Shows up after roughly 3-4 white spikes
-  let xThreshold = 60; 
+  // Excitability (Input Current Amps)
+  let I_WT   = 10;  
+  let I_FAST = 70;  
+  let I_SLOW = 14;  
+  
+  let gK_WT   = 36;
+  let gK_FAST = 36;
+  let gK_SLOW = 52; 
+  // ==========================================
 
-  let dt = 0.05, t = 0;     
-  let x = 0, prevX = 0; 
-  let I = 0; 
-  let labels = [];
+  const panelHeight = 260; // spike height stays the same
+  const panelSpacing = 200; // slightly closer, but not squished
+  const panelYOffset = 100; // move all traces down by 250px
+  const panel1Y = panelYOffset;
+  const panel2Y = panel1Y + panelSpacing;
+  const panel3Y = panel2Y + panelSpacing;
+  const axisY   = CANVAS_HEIGHT - 40;
 
-  // --- STIMULUS KNOBS ---
-  let stimStart = 20;   
-  let stimTime  = 800;  
-  let stimAmp   = 15;   // Increased amplitude to force more activity
-  let stimEnd   = stimStart + stimTime;
+  let cWhite = [179, 179, 179], cRed = [169, 40, 67], cBlue = [0, 161, 183], cAxis = [255, 255, 255, 100];
 
-  // --- CONDUCTANCE KNOBS (Hyper-Excited Red) ---
-  const gNa_wt = 120;  
-  const gNa_mut = 400; // EXTREME excitability for the red trace
+  let V1=-70, n1=0.3177, m1=0.0529, h1=0.5961; 
+  let V2=-70, n2=0.3177, m2=0.0529, h2=0.5961; 
+  let V3=-70, n3=0.3177, m3=0.0529, h3=0.5961; 
+
+  let prevY1, prevY2, prevY3;
+  let x = 0, prevX = 0, t = 0;     
+  
+  // We calculate exactly how much simulation time passes per pixel
+  const msPerPixel = TIME_WINDOW_MS / CANVAS_WIDTH;
+  const dt = 0.01; // Tiny math step for high stability
 
   p.setup = () => {
-    p.createCanvas(1400, 600);
+    p.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
     p.background(0); 
     p.textFont('monospace');
-    prevY_wt = p.map(V_wt, -100, 50, p.height - 60, 0);
-    prevY_mut = p.map(V_mut, -100, 50, p.height - 60, 0);
+    prevY1 = mapVoltage(p, -70, panel1Y, panelHeight);
+    prevY2 = mapVoltage(p, -70, panel2Y, panelHeight);
+    prevY3 = mapVoltage(p, -70, panel3Y, panelHeight);
   };
 
   p.draw = () => {
-    I = (t > stimStart && t < stimEnd) ? stimAmp : 0;
+    // Determine target time for this frame based on current x
+    let nextX = x + ANIMATION_SPEED;
+    let targetT = nextX * msPerPixel;
 
-    for (let i = 0; i < 2; i++) {
-      // WT HH Integration
-      let res_wt = calculateHH(V_wt, m_wt, h_wt, n_wt, gNa_wt, I);
-      V_wt = res_wt.V; m_wt = res_wt.m; h_wt = res_wt.h; n_wt = res_wt.n;
+    // --- 1. PHYSICS LOOP ---
+    // Instead of fixed loops, we calculate enough math to reach the next X position
+    while (t < targetT && x < CANVAS_WIDTH) {
+      let active = (t > 10 && t < 190); 
 
-      // Red HH Integration
-      let res_mut = calculateHH(V_mut, m_mut, h_mut, n_mut, gNa_mut, I);
-      V_mut = res_mut.V; m_mut = res_mut.m; h_mut = res_mut.h; n_mut = res_mut.n;
+
+      V1 = calculateHH(V1, n1, m1, h1, 120, gK_WT, active ? I_WT : 0, (res) => { V1=res.V; n1=res.n; m1=res.m; h1=res.h; });
+
+      // Make the red/fast trace more excitable: continuous, stronger current pulse, and higher spike amplitude
+      let fastActive = (t > 10 && t < 190);
+      let I_FAST_EXCITABLE = 110; // much higher than I_WT
+      let gNa_FAST_EXCITABLE = 145; // increase from 120 to 145 for taller spikes
+      V2 = calculateHH(V2, n2, m2, h2, gNa_FAST_EXCITABLE, gK_FAST, fastActive ? I_FAST_EXCITABLE : 0, (res) => { V2=res.V; n2=res.n; m2=res.m; h2=res.h; });
+
+      // For the blue/slow trace, give two pulses: 10-90ms and 110-190ms
+      let slowActive = (t > 10 && t < 90) || (t > 110 && t < 190);
+      V3 = calculateHH(V3, n3, m3, h3, 120, gK_SLOW, slowActive ? I_SLOW : 0, (res) => { V3=res.V; n3=res.n; m3=res.m; h3=res.h; });
+
       t += dt;
     }
 
-    let y_wt = p.map(V_wt, -100, 50, p.height - 60, 0);
-    let y_mut = p.map(V_mut, -100, 50, p.height - 60, 0);
+    // --- 2. MAPPING ---
+    let y1 = mapVoltage(p, V1, panel1Y, panelHeight);
+    let y2 = mapVoltage(p, V2, panel2Y, panelHeight);
+    let y3 = mapVoltage(p, V3, panel3Y, panelHeight);
 
-    // Clear UI strip
-    p.fill(0);
-    p.noStroke();
-    p.rect(0, p.height - 50, p.width, 50); 
+    // Clear Footer
+    p.fill(0); p.noStroke();
+    p.rect(0, CANVAS_HEIGHT - 70, p.width, 70);
 
-    // 1. Draw WHITE Trace
-    p.stroke(...wtTraceColor);
-    p.strokeWeight(1.5);
-    p.line(prevX, prevY_wt, x, y_wt);
-
-    // 2. Draw RED Trace (With slight vertical offset to ensure visibility)
-    if (x > xThreshold) {
-      p.stroke(...mutTraceColor);
-      p.strokeWeight(2.5); 
-      // Offset by +2 pixels so it isn't perfectly hidden by the white line
-      p.line(prevX, prevY_mut + 2, x, y_mut + 2);
-    }
-
-    // 3. UI Elements
-    p.stroke(...timeAxisColor);
+    // --- 3. DRAWING ---
     p.strokeWeight(2);
-    p.line(0, p.height - 30, x, p.height - 30);
+    p.stroke(...cWhite); p.line(prevX, prevY1, x, y1);
+    p.stroke(...cRed);   p.line(prevX, prevY2, x, y2);
+    p.stroke(...cBlue);  p.line(prevX, prevY3, x, y3);
+
+    // Axis
+    p.stroke(...cAxis);
+    p.line(0, axisY, x, axisY);
     handleFadingLabels(p, x, t);
 
+    // --- 4. ADVANCE & RESET ---
     prevX = x;
-    prevY_wt = y_wt;
-    prevY_mut = y_mut;
-    x += 0.5;
+    prevY1 = y1; prevY2 = y2; prevY3 = y3;
+    x = nextX; 
 
-    if (x > p.width) {
-      x = 0; prevX = 0; t = 0;
-      V_wt = -70; n_wt = 0.3177; m_wt = 0.0529; h_wt = 0.5961;
-      V_mut = -70; n_mut = 0.3177; m_mut = 0.0529; h_mut = 0.5961;
-      labels = []; 
+    if (x >= CANVAS_WIDTH) { 
       p.background(0);
-      prevY_wt = p.map(V_wt, -100, 50, p.height - 60, 0);
-      prevY_mut = p.map(V_mut, -100, 50, p.height - 60, 0);
+      x = 0; prevX = 0; t = 0;
+      V1=-70; V2=-70; V3=-70;
+      n1=0.3177; m1=0.0529; h1=0.5961;
+      n2=0.3177; m2=0.0529; h2=0.5961;
+      n3=0.3177; m3=0.0529; h3=0.5961;
+      labels = [];
+      prevY1 = mapVoltage(p, -70, panel1Y, panelHeight);
+      prevY2 = mapVoltage(p, -70, panel2Y, panelHeight);
+      prevY3 = mapVoltage(p, -70, panel3Y, panelHeight);
     }
   };
 
-  function calculateHH(V, m, h, n, gNa, currentI) {
-    const ENa = 50, EK = -77, EL = -54.4; 
-    const gK = 36, gL = 0.3;   
+  function mapVoltage(p, V, offset, h) {
+    return p.map(V, -100, 50, offset + h - 30, offset + 30);
+  }
+
+  function calculateHH(V, n, m, h, gNa, gK, I, update) {
+    const ENa = 50, EK = -77, EL = -54.4, gL = 0.3;   
     let an = 0.01 * (V + 55) / (1 - Math.exp(-(V + 55) / 10));
     let bn = 0.125 * Math.exp(-(V + 65) / 80);
     let am = 0.1 * (V + 40) / (1 - Math.exp(-(V + 40) / 10));
@@ -105,26 +127,26 @@ window.neuronSketch = (p) => {
     n += dt * (an * (1 - n) - bn * n);
     m += dt * (am * (1 - m) - bm * m);
     h += dt * (ah * (1 - h) - bh * h);
-    let INa = gNa * Math.pow(m, 3) * h * (V - ENa);
-    let IK = gK * Math.pow(n, 4) * (V - EK);
-    let IL = gL * (V - EL);
-    V += dt * (currentI - INa - IK - IL);
-    return { V, m, h, n };
+    V += dt * (I - (gNa*Math.pow(m,3)*h*(V-ENa)) - (gK*Math.pow(n,4)*(V-EK)) - (gL*(V-EL)));
+    update({V, n, m, h});
+    return V;
   }
 
+  let labels = [];
   function handleFadingLabels(p, currentX, currentTime) {
-    if (Math.floor(currentTime) % 20 === 0 && Math.floor(currentTime) !== Math.floor(currentTime - 0.1)) {
-      labels.push({ xPos: currentX, val: Math.floor(currentTime), alpha: 0, isText: true });
+    // Only show labels for multiples of 25, starting at 25 (not 0)
+    let rounded = Math.floor(currentTime);
+    if (rounded >= 25 && rounded % 25 === 0 && (labels.length === 0 || labels[labels.length-1].val !== rounded)) {
+      labels.push({ xPos: currentX, val: rounded, alpha: 0 });
     }
     for (let l of labels) {
-      if (l.alpha < 255) l.alpha += 5; 
-      p.textAlign(p.CENTER);
+      if (l.alpha < 255) l.alpha += 10; 
       p.stroke(255, l.alpha * 0.4);
-      p.line(l.xPos, p.height - 30, l.xPos, p.height - 35);
-      p.noStroke();
-      p.fill(255, l.alpha);
-      p.textSize(9);
-      p.text(l.val, l.xPos, p.height - 12);
+      // Draw tick downward from axis line (at p.height - 40)
+      p.line(l.xPos, p.height - 40, l.xPos, p.height - 35);
+      p.noStroke(); p.fill(179, l.alpha);
+      p.textAlign(p.CENTER); p.textSize(8);
+      p.text(l.val , l.xPos, p.height - 15);
     }
   }
 };

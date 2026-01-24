@@ -35,7 +35,7 @@ export default function Home() {
           <p className="tag">Simulating the future of neuroscience.</p>
         </div>
       </section>
-      <section
+      {/* <section
         className={`below-hero${showBelowHero ? ' reveal' : ''}`}
         style={{
           width: '100%',
@@ -60,12 +60,24 @@ export default function Home() {
           <h2>What we do</h2>
           <p>We develop simulation tools and analysis pipelines to better understand neuronal dynamics and computation.</p>
         </div>
-      </section>
+      </section> */}
       {/* Second full-viewport section, SpaceX style */}
+
       <section className="second-section">
-        <div className="second-section-content">
-          {/* <h2>Action Potential Live Trace</h2> */}
-          <div id="neuron-container" style={{ width: '100%', height: 800, margin: '0 auto' }} />
+        <div className="neuron-blurb-row">
+          <div className="neuron-right">
+            <div className="blurb mission-blurb">
+              <h2>Accelerating <br />Neuroscience<br />Discovery</h2>
+              <p>
+                We simulate neurons to improve diagnostics and develop tools for drug makers to better accelerate preclinical research. 
+                
+                <br></br><br></br>Our advanced computational models help decode neuronal behavior, enabling faster, more precise insights for both clinicians and pharmaceutical innovators.
+              </p>
+            </div>
+          </div>
+          <div className="neuron-left">
+            <div id="neuron-container" style={{ width: '100%', height: 800 }} />
+          </div>
         </div>
       </section>
 

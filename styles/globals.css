@@ -99,14 +99,68 @@ html, body {
   pointer-events: auto;
 }
 
+
 .second-section {
-  background: #111; /* Slightly lighter for separation */
+  background: #000;
   z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+
+.neuron-blurb-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center; /* center both boxes vertically */
+  justify-content: center;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  gap: 96px; /* increase gap to prevent overlap */
+}
+
+
+.neuron-left {
+  flex: 1 1 60%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  margin-right: 40px; /* move animation to the right */
+}
+
+
+
+.neuron-right {
+  flex: 1 1 40%;
+  display: flex;
+  align-items: center; /* center blurb vertically */
+  justify-content: flex-start;
+  min-width: 0;
+  margin-left: 0;
+  margin-right: 64px; /* move blurb further left */
+}
+
+
+
+
+.mission-blurb {
+  background: none;
+  border-radius: 0;
+  padding: 0;
+  max-width: 800px;
+  text-align: left;
+  box-shadow: none;
+  font-size: 1.45rem;
+  line-height: 1.7;
+  margin-top: 0;
 }
 
 /* --- 5. Components & UI --- */
 .blurb {
-  background: rgba(20, 20, 20, 0.7);
+  background: rgba(0, 0, 0);
   border-radius: 16px;
   padding: 32px;
   max-width: 700px;
