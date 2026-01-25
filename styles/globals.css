@@ -1,82 +1,10 @@
-/* Ion Channel Section Styles */
-.ion-channel-section {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  z-index: 4;
-}
-
-
-.ion-channel-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  width: 100%;
-  max-width: 1800px;
-  margin: 0 auto;
-  gap: 280px;
-}
-
-
-.ion-channel-left {
-  flex: 1 1 40%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  min-width: 0;
-  margin-left: 40px;
-}
-
-
-.ion-channel-right {
-  flex: 1 1 60%;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  min-width: 0;
-}
-
-
-.ion-channel-blurb {
-  max-width: 900px;
-  text-align: left;
-  font-size: 1.35rem;
-  line-height: 1.7;
-}
-/* Ion Channel Section Styles */
-.ion-channel-section {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  z-index: 4;
-}
-
-.ion-channel-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
-}
-/* --- 1. Global Reset & Root Variables --- */
+/* --- 1. Global Reset & Variables --- */
 :root {
   --bg: #000000;
-  --card: #050505;
-  --header-bg: #0b0f14;
-  --muted: #9aa4b2;
-  --accent: #6ee7b7;
+  --accent: #00a1b7; /* Your specific Blue [0, 161, 183] */
   --text: #e6eef6;
+  --muted: #9aa4b2;
+  --max-width: 1400px;
 }
 
 * {
@@ -91,25 +19,17 @@ html, body {
   background: var(--bg);
   color: var(--text);
   font-family: Inter, system-ui, -apple-system, sans-serif;
-  overflow-x: hidden; /* Critical: prevents horizontal scroll drift */
+  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-/* --- 2. Layout Containers --- */
-#__next, .app, .content {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-
-/* --- 3. Hero Section --- */
+/* --- 2. Hero Section --- */
 .full-bleed-hero {
   position: relative;
   width: 100%;
   height: 100vh;
   overflow: hidden;
-  z-index: 0;
+  z-index: 1;
 }
 
 .full-bleed-video {
@@ -119,8 +39,7 @@ html, body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: brightness(0.5);
-  pointer-events: none;
+  filter: brightness(0.4);
 }
 
 .hero-center {
@@ -133,7 +52,7 @@ html, body {
   justify-content: flex-start;
   padding-top: 15vh;
   text-align: center;
-  z-index: 1;
+  z-index: 2;
 }
 
 .hero-center h1 {
@@ -146,240 +65,119 @@ html, body {
   margin-bottom: 20px;
 }
 
-/* --- 4. Transitioning Sections --- */
-.below-hero, .second-section {
+/* --- 3. Master Content Layout (The Alignment Fix) --- */
+.content-section {
   width: 100%;
   min-height: 100vh;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 2;
-  padding: 40px 20px;
-}
-
-.below-hero {
   background: #000;
-  opacity: 0;
-  transition: opacity 0.8s cubic-bezier(.4,0,.2,1);
+  padding: 100px 40px;
 }
 
-.below-hero.reveal {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-
-.second-section {
-  background: #000;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-
-.neuron-blurb-row {
+.content-row {
   display: flex;
   flex-direction: row;
-  align-items: center; /* center both boxes vertically */
-  justify-content: center;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  max-width: 2000px;
-  margin: 0 auto;
-  gap: 96px; /* increase gap to prevent overlap */
+  max-width: var(--max-width);
+  gap: 120px; /* Increased gap for breathing room */
 }
 
+.content-text-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 
-.neuron-left {
-  flex: 1 1 60%;
+.content-visual-side {
+  flex: 1;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  min-width: 0;
-  margin-right: 40px; /* move animation to the right */
+  justify-content: center;
 }
 
-
-
-.neuron-right {
-  flex: 1 1 40%;
-  display: flex;
-  align-items: center; /* center blurb vertically */
-  justify-content: flex-start;
-  min-width: 0;
-  margin-left: 0;
-  margin-right: 64px; /* move blurb further left */
-}
-
-
-
-
+/* --- 4. Blurb Styling --- */
 .mission-blurb {
-  background: none;
-  border-radius: 0;
-  padding: 0;
-  max-width: 1100px;
+  max-width: 600px;
   text-align: left;
-  box-shadow: none;
-  font-size: 1.45rem;
+}
+
+.mission-blurb h2 {
+  font-size: 2.8rem;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.mission-blurb p {
+  font-size: 1.35rem;
   line-height: 1.7;
-  margin-top: 0;
+  color: var(--text);
 }
 
-/* --- 5. Components & UI --- */
-.blurb {
-  background: rgba(0, 0, 0);
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 700px;
-  text-align: center;
-  box-shadow: 0 4px 32px rgba(0,0,0,0.5);
+/* --- 5. Canvas Containers --- */
+.canvas-wrapper {
+  width: 800px;
+  height: 600px;
+  position: relative;
 }
 
-.actions {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 30px;
+.canvas-wrapper-small {
+  width: 400px;
+  height: 400px;
+  position: relative;
 }
 
+.canvas-wrapper-network {
+  width: 800px;
+  height: 800px; /* Synchronized with the 800x800 p5.js canvas */
+  position: relative;
+}
+
+/* --- 6. Navigation & Buttons --- */
 .btn {
   background: var(--accent);
-  color: #062018;
+  color: #fff;
   padding: 12px 24px;
   border-radius: 8px;
   text-decoration: none;
   font-weight: 600;
+  display: inline-block;
   transition: transform 0.2s;
-}
-
-.btn-ghost {
-  background: transparent;
-  border: 1px solid var(--text);
-  color: var(--text);
 }
 
 .btn:hover {
   transform: translateY(-2px);
 }
 
-/* --- 6. Hamburger Menu --- */
-.hamburger-menu {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 9999;
-}
-
-.hamburger-btn {
-  background: rgba(20, 20, 20, 0.8);
-  border: none;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-/* Hamburger icon (three bars) */
-.hamburger {
-  display: inline-block;
-  width: 32px;
-  height: 24px;
-  position: relative;
-}
-.hamburger span {
-  display: block;
-  height: 4px;
-  width: 100%;
-  background: var(--text);
-  border-radius: 2px;
-  position: absolute;
-  left: 0;
-  transition: 0.3s;
-}
-.hamburger span:nth-child(1) { top: 0; }
-.hamburger span:nth-child(2) { top: 10px; }
-.hamburger span:nth-child(3) { top: 20px; }
-.hamburger.active span:nth-child(1) {
-  top: 10px;
-  transform: rotate(45deg);
-}
-.hamburger.active span:nth-child(2) {
-  opacity: 0;
-}
-.hamburger.active span:nth-child(3) {
-  top: 10px;
-  transform: rotate(-45deg);
-}
-
-/* Dropdown menu overlay */
-.dropdown-menu {
-  position: fixed;
-  top: 60px;
-  left: 20px;
-  min-width: 220px;
-  background: rgba(20, 20, 20, 0.92);
-  border-radius: 12px;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.22);
-  padding: 24px 20px 18px 20px;
-  z-index: 1000;
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.32s, transform 0.32s;
-}
-.dropdown-animate-in {
-  animation: dropdownSlideDown 0.32s cubic-bezier(.4,0,.2,1);
-}
-.dropdown-animate-out {
-  animation: dropdownSlideUp 0.32s cubic-bezier(.4,0,.2,1);
-  opacity: 0 !important;
-  transform: translateY(-32px) !important;
-}
-@keyframes dropdownSlideDown {
-  from { opacity: 0; transform: translateY(-32px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes dropdownSlideUp {
-  from { opacity: 1; transform: translateY(0); }
-  to { opacity: 0; transform: translateY(-32px); }
-}
-.dropdown-brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-weight: 700;
-  font-size: 1.6rem;
-  margin-bottom: 18px;
-  color: var(--text);
-}
-.dropdown-brand .brand-logo {
-  height: 32px;
-  width: auto;
-  display: inline-block;
-}
-.dropdown-menu nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-.dropdown-menu nav a {
-  color: var(--muted);
-  text-decoration: none;
-  font-size: 1.75rem;
-  padding: 10px 0;
-  border-radius: 4px;
-  transition: background 0.18s, color 0.18s;
-}
-
-.dropdown-menu nav a:hover {
-  color: var(--accent);
-  background: rgba(255,255,255,0.04);
-}
-
 .site-footer {
-  padding: 40px;
+  padding: 60px 40px;
   text-align: center;
   color: var(--muted);
-  border-top: 1px solid rgba(255,255,255,0.05);
+  background: #000;
+}
+
+/* --- 7. Responsive Design --- */
+@media (max-width: 1200px) {
+  .content-row {
+    gap: 60px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .content-row {
+    flex-direction: column !important;
+    text-align: center;
+    gap: 50px;
+  }
+  .mission-blurb {
+    text-align: center;
+    max-width: 100%;
+  }
+  .content-text-side, .content-visual-side {
+    width: 100%;
+  }
 }
