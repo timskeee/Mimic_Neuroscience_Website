@@ -67,11 +67,10 @@ export default function Home() {
         <div className="neuron-blurb-row">
           <div className="neuron-right">
             <div className="blurb mission-blurb">
-              <h2>Accelerating <br />Neuroscience<br />Discovery</h2>
+              <h2>Accelerating Neuroscience Discovery</h2>
               <p>
-                We simulate neurons to improve diagnostics and develop tools for drug makers to better accelerate preclinical research. 
-                
-                <br></br><br></br>Our advanced computational models help decode neuronal behavior, enabling faster, more precise insights for both clinicians and pharmaceutical innovators.
+                <br></br>We simulate neurons to improve diagnostics and develop tools for drug makers to better accelerate preclinical research. 
+                <br></br><br></br>Our computational models help decode neuronal behavior, enabling faster, more precise insights for both clinicians and pharmaceutical innovators.
               </p>
             </div>
           </div>
@@ -81,7 +80,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Dynamically load p5.js and sketch.js only on client to avoid hydration errors */}
+      {/* Ion Channel Animation Section */}
+      <section className="ion-channel-section">
+        <div className="ion-channel-row">
+          <div className="ion-channel-left">
+            <div id="channel-container" style={{ width: 400, height: 400 }} />
+          </div>
+          <div className="ion-channel-right">
+            <div className="blurb ion-channel-blurb">
+              <h2>Ion Channel Animation</h2>
+              <p>
+                This animation demonstrates how ion channels open and close to allow ions to pass through the cell membrane. The gate in the center opens and closes, and ions (white dots) flow through when the channel is open, illustrating the fundamental mechanism of neuronal signaling.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Dynamically load p5.js and both sketches only on client to avoid hydration errors */}
       {typeof window !== 'undefined' && <ClientP5Loader />}
     </>
   );
@@ -96,19 +112,26 @@ function ClientP5Loader() {
     const script = document.createElement('script');
     script.id = 'p5-cdn';
     script.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js';
-    
+
     script.onload = () => {
-      // 2. Once p5 is loaded from CDN, load your sketch
-      const sketchScript = document.createElement('script');
-      sketchScript.src = '/sketch.js';
-      
-      sketchScript.onload = () => {
-        // 3. Initialize using the global window.p5 and window.neuronSketch
+      // Load traces sketch
+      const tracesScript = document.createElement('script');
+      tracesScript.src = '/traces_sketch.js';
+      tracesScript.onload = () => {
         if (window.p5 && window.neuronSketch) {
           new window.p5(window.neuronSketch, 'neuron-container');
         }
+        // Load ion channel sketch after traces sketch
+        const ionScript = document.createElement('script');
+        ionScript.src = '/ion_channel.js';
+        ionScript.onload = () => {
+          if (window.p5 && window.ionChannelSketch) {
+            new window.p5(window.ionChannelSketch, 'channel-container');
+          }
+        };
+        document.body.appendChild(ionScript);
       };
-      document.body.appendChild(sketchScript);
+      document.body.appendChild(tracesScript);
     };
 
     document.body.appendChild(script);
