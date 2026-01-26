@@ -18,7 +18,7 @@ window.ionChannelSketch = (p) => {
   const ION_COLOR = [180, 180, 255, 200];    
   const ION_FADE = [180, 180, 255, 150];     
   // Single constant to control drawn ion size (use this to tweak sizes)
-  const ION_SIZE = 4;
+  const ION_SIZE = 2.5;
   
   let gateState = 0; 
   let isOpening = false;
@@ -31,7 +31,7 @@ window.ionChannelSketch = (p) => {
   };
 
   p.draw = () => {
-    p.background(0);
+    p.clear();
     let midX = p.width / 2;
     let midY = p.height / 2;
     let topLimit = midY - channelHeight/2;

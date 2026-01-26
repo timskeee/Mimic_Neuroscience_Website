@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <filter id="noise"><feTurbulence baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/></filter>
+  <rect width="64" height="64" filter="url(#noise)" opacity="0.12" fill="#000"/>
+</svg>

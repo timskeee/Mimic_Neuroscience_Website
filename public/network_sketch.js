@@ -24,7 +24,7 @@ window.networkSketch = (p) => {
   };
 
   p.draw = () => {
-    p.background(0);
+    p.clear();
     p.translate(p.width / 2, p.height / 2); 
 
     let rotY = p.frameCount * 0.0032; 

@@ -2,7 +2,7 @@ window.neuronSketch = (p) => {
   // ==========================================
   // --- CONTROL PANEL ---
   // ==========================================
-  const ANIMATION_SPEED = 0.80;   // LOWER = Slower drawing; HIGHER = Faster drawing
+  const ANIMATION_SPEED = 0.90;   // LOWER = Slower drawing; HIGHER = Faster drawing
   const TIME_WINDOW_MS  = 200;   // Always spans the full 1400px
   const CANVAS_WIDTH    = 800;
   const CANVAS_HEIGHT   = 800;
@@ -37,7 +37,7 @@ window.neuronSketch = (p) => {
   const panel3Y = panel2Y + panelSpacing;
   const axisY   = CANVAS_HEIGHT - 40;
 
-  let cWhite = [179, 179, 179], cRed = [169, 40, 67], cBlue = [0, 161, 183], cAxis = [255, 255, 255, 100];
+  let cWhite = [179, 179, 179], cRed = [169, 40, 67], cBlue = [0, 161, 183], cAxis = [120, 120, 120, 60];
 
   let V1=-70, n1=0.3177, m1=0.0529, h1=0.5961; 
   let V2=-70, n2=0.3177, m2=0.0529, h2=0.5961; 
@@ -52,7 +52,7 @@ window.neuronSketch = (p) => {
 
   p.setup = () => {
     p.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-    p.background(0); 
+    p.clear();
     p.textFont('monospace');
     prevY1 = mapVoltage(p, -70, panel1Y, panelHeight);
     prevY2 = mapVoltage(p, -70, panel2Y, panelHeight);
@@ -93,9 +93,7 @@ window.neuronSketch = (p) => {
     let y2 = mapVoltage(p, V2, panel2Y, panelHeight);
     let y3 = mapVoltage(p, V3, panel3Y, panelHeight);
 
-    // Clear Footer
-    p.fill(0); p.noStroke();
-    p.rect(0, CANVAS_HEIGHT - 70, p.width, 70);
+    // Footer is transparent now (no background rectangle)
 
     // --- 3. DRAWING ---
     p.strokeWeight(2);
@@ -115,7 +113,7 @@ window.neuronSketch = (p) => {
     x = nextX; 
 
     if (x >= CANVAS_WIDTH) { 
-      p.background(0);
+      p.clear();
       x = 0; prevX = 0; t = 0;
       V1=-70; V2=-70; V3=-70;
       n1=0.3177; m1=0.0529; h1=0.5961;
@@ -157,11 +155,15 @@ window.neuronSketch = (p) => {
     }
     for (let l of labels) {
       if (l.alpha < 255) l.alpha += 10; 
-      p.stroke(255, l.alpha * 0.4);
-      // Draw tick downward from axis line (at p.height - 40)
+      // compute effective alpha for ticks/text using cAxis base alpha (if present)
+      const baseAxisAlpha = (Array.isArray(cAxis) && cAxis.length > 3) ? cAxis[3] : 255;
+      const effectiveAlpha = Math.round(baseAxisAlpha * (l.alpha / 255));
+      // Draw tick downward from axis line (at p.height - 40) using axis color
       const tickX = Math.round(l.xPos);
+      p.stroke(cAxis[0], cAxis[1], cAxis[2], effectiveAlpha);
       p.line(tickX, p.height - 40, tickX, p.height - 35);
-      p.noStroke(); p.fill(179, l.alpha);
+      p.noStroke();
+      p.fill(cAxis[0], cAxis[1], cAxis[2], effectiveAlpha);
       p.textAlign(p.CENTER); p.textSize(8);
       p.text(l.val , tickX, p.height - 15);
     }

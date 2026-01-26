@@ -2,8 +2,10 @@
 
 import Link from 'next/link'
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 export default function Layout({ children }) {
+  const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
   const [menuAnimating, setMenuAnimating] = useState(false)
   const dropdownRef = useRef(null)
@@ -57,6 +59,13 @@ export default function Layout({ children }) {
             <span></span>
           </span>
         </button>
+        {/* show a small persistent brand to the right of the hamburger on non-home pages */}
+        {router && router.pathname !== '/' && (
+          <Link href="/" onClick={() => {}} className="hamburger-brand">
+            <span className="hamburger-brand-text">Mimic Neuroscience</span>
+            <img src="/images/logo_white.png" alt="Mimic Neuroscience logo" className="hamburger-brand-logo" />
+          </Link>
+        )}
       </div>
 
       {(menuOpen || menuAnimating) && (

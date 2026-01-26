@@ -1,0 +1,188 @@
+/* Layout and card styles for People page */
+.page {
+  padding: 48px 24px;
+  display: grid;
+  /* a bit wider center column for People page */
+  grid-template-columns: 1fr min(1100px, 100%) 1fr;
+  gap: 20px;
+}
+
+/* make direct children sit in the centered content column */
+.page > * {
+  grid-column: 2 / 3;
+}
+
+.header h1 {
+  margin-bottom: 6px;
+}
+.sectionTitle {
+  margin-top: 36px;
+  margin-bottom: 18px;
+  font-size: 1.6rem;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
+.gridSmall {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+/* Card styles - remove boxed background and border so entries don't appear as white cards */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  padding: 8px 6px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  overflow: visible;
+  text-align: center;
+}
+.card:focus {
+  outline: 2px solid rgba(0,161,183,0.18);
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, rgba(0,161,183,0.16), rgba(0,161,183,0.06));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 120px;
+}
+.avatarInner {
+  width: 104px;
+  height: 104px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: var(--text);
+  font-size: 1.2rem;
+}
+.meta {
+  flex: 1 1 auto;
+  text-align: center;
+}
+.name {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.title {
+  color: var(--muted);
+  font-size: 0.97rem;
+}
+/* overlay removed — no View bio text */
+
+/* Modal */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+}
+.modal {
+  width: min(720px, 92vw);
+  background: rgba(10,12,14,0.96);
+  border-radius: 12px;
+  padding: 22px;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.closeBtn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 24px;
+  cursor: pointer;
+}
+.modalBody {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+.modalAvatar {
+  width: 140px;
+  height: 140px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 2rem;
+  color: var(--text);
+  flex: 0 0 140px;
+}
+
+/* pop animation element when opening bio from avatar */
+.pop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  background: rgba(10,12,14,0.96);
+  color: var(--text);
+  z-index: 1200000;
+  overflow: hidden;
+  transition: left 320ms cubic-bezier(.2,.8,.2,1), top 320ms cubic-bezier(.2,.8,.2,1), width 320ms cubic-bezier(.2,.8,.2,1), height 320ms cubic-bezier(.2,.8,.2,1), border-radius 320ms, transform 320ms;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.expanded {}
+.pop.expanded {
+  left: 50%;
+  top: 50%;
+  width: min(720px, 92vw);
+  height: auto;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  padding: 22px;
+}
+.popContent {
+  opacity: 0;
+  transition: opacity 200ms 180ms ease;
+}
+.pop.expanded .popContent {
+  opacity: 1;
+}
+
+/* sleek closing state: fade and slightly scale down instead of flying back */
+.pop.closing {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.96);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+@media (max-width: 640px) {
+  .avatar { width: 96px; height: 96px; }
+  .avatarInner { width: 80px; height: 80px; font-size: 1rem }
+  .modalBody { flex-direction: column; align-items: center; text-align: center }
+  .modalAvatar { margin-bottom: 8px }
+}

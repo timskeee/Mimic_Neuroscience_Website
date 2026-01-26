@@ -76,11 +76,11 @@ export default function Home() {
         <div className="content-row">
           <div className="content-text-side">
             <div className="mission-blurb">
-              <h2>Simulating Circuits with Neuronal Networks.</h2>
+              <h2>Neural Circuits, Reimagined.</h2>
               <p>
-                This immersive 3D animation visualizes a dynamic network of neurons inside a virtual cylinder. 
-                Pulses travel along branching dendrites, simulating the complexity and beauty of neural computation. 
-                Rotate and zoom to explore the network in 3D.
+                Simulations of neural circuits reveal how collective dynamics produce computation.
+                Large-scale models lead us closer to whole-brain function.
+                
               </p>
             </div>
           </div>
