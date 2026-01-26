@@ -28,8 +28,9 @@ window.networkSketch = (p) => {
     p.translate(p.width / 2, p.height / 2); 
 
     let rotY = p.frameCount * 0.0032; 
-    waveY -= WAVE_SPEED;
-    if (waveY < -450) waveY = 450;
+    // travel top -> bottom by increasing waveY
+    waveY += WAVE_SPEED;
+    if (waveY > 450) waveY = -450;
 
     for (let n of neurons) {
       n.screenZ = n.pos.x * p.sin(rotY) + n.pos.z * p.cos(rotY);

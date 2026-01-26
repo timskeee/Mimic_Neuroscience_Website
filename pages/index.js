@@ -39,7 +39,7 @@ export default function Home() {
         <div className="content-row">
           <div className="content-text-side">
             <div className="mission-blurb">
-              <h2>Accelerating Neuroscience Discovery</h2>
+              <h2>Accelerating Neuroscience Discovery.</h2>
               <p>
                 We simulate neurons to improve diagnostics and develop tools for drug makers to better accelerate preclinical research. 
                 <br /><br />
@@ -55,7 +55,8 @@ export default function Home() {
 
       {/* --- 2. ION CHANNEL SECTION (Animation Left, Text Right) --- */}
       <section className="content-section">
-        <div className="content-row">
+        {/* add row--visual-left so CSS can flip which column the visual/text occupy */}
+        <div className="content-row row--visual-left">
           <div className="content-visual-side">
             <div id="channel-container" className="canvas-wrapper-small" />
           </div>
@@ -63,7 +64,7 @@ export default function Home() {
             <div className="mission-blurb">
               <h2>Precision Simulations for Better Medicine.</h2>
               <p>
-                We model ion channel kinetics to streamline drug discovery and unlock deeper diagnostic insights through high-fidelity digital twins of the cellular membrane.
+                We model ion channels to streamline drug discovery and unlock deeper diagnostic insights through high-fidelity digital twins.
               </p>
             </div>
           </div>
@@ -75,7 +76,7 @@ export default function Home() {
         <div className="content-row">
           <div className="content-text-side">
             <div className="mission-blurb">
-              <h2>Multiplying Neuron Network</h2>
+              <h2>Simulating Circuits with Neuronal Networks.</h2>
               <p>
                 This immersive 3D animation visualizes a dynamic network of neurons inside a virtual cylinder. 
                 Pulses travel along branching dendrites, simulating the complexity and beauty of neural computation. 

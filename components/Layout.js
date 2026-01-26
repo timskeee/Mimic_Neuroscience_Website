@@ -64,12 +64,11 @@ export default function Layout({ children }) {
           ref={dropdownRef}
           className={`dropdown-menu${menuOpen && !menuAnimating ? ' dropdown-animate-in' : ''}${menuAnimating ? ' dropdown-animate-out' : ''}`}
         >
-          <div className="dropdown-brand">
+          <Link href="/" onClick={handleLinkClick} className="dropdown-brand">
             <span>Mimic Neuroscience</span>
             <img src="/images/logo_white.png" alt="Mimic Neuroscience logo" className="brand-logo" />
-          </div>
+          </Link>
           <nav>
-            <Link href="/" onClick={handleLinkClick}>Home</Link>
             <Link href="/technology" onClick={handleLinkClick}>Technology</Link>
             <Link href="/people" onClick={handleLinkClick}>People</Link>
             <Link href="/contact" onClick={handleLinkClick}>Contact</Link>

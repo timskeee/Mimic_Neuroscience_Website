@@ -10,10 +10,15 @@ window.ionChannelSketch = (p) => {
   const innerWidthMax = 42; 
   const channelHeight = 130;
   
-  // Unified Colors preserved from your file
-  const STRUCT_COLOR = [229, 228, 226]; 
-  const ION_COLOR = [180, 180, 255, 120];    
-  const ION_FADE = [180, 180, 255, 120];     
+  //Channel Colors
+  const OUTER_STRUCT_COLOR = [180, 180, 180,200];
+  const PORE_COLOR = [245, 245, 250];
+  const MEMBRANE_COLOR = [179, 179, 179,120];
+
+  const ION_COLOR = [180, 180, 255, 200];    
+  const ION_FADE = [180, 180, 255, 150];     
+  // Single constant to control drawn ion size (use this to tweak sizes)
+  const ION_SIZE = 4;
   
   let gateState = 0; 
   let isOpening = false;
@@ -32,7 +37,7 @@ window.ionChannelSketch = (p) => {
     let topLimit = midY - channelHeight/2;
     let botLimit = midY + channelHeight/2;
 
-    if (p.frameCount % 300 === 0) isOpening = !isOpening;
+    if (p.frameCount % 100 === 0) isOpening = !isOpening;
     
     let lerpSpeed = isOpening ? 0.07 : 0.03; 
     gateState = p.lerp(gateState, isOpening ? 1 : 0, lerpSpeed); 
@@ -48,29 +53,44 @@ window.ionChannelSketch = (p) => {
     }
 
     // --- LAYER 2: CHANNEL & MEMBRANE (Drawn second) ---
-    p.strokeWeight(1.5);
     p.noFill();
-    p.stroke(...STRUCT_COLOR);
-    
+
     let currentPore = p.max(4, gateState * innerWidthMax);
 
-    // Membrane Horizontal Lines
+    // Membrane Horizontal Lines (draw first in this layer)
+    p.strokeWeight(1.2);
+    p.stroke(...MEMBRANE_COLOR);
     p.line(0, midY, midX - outerWidth/2, midY);
     p.line(midX + outerWidth/2, midY, p.width, midY);
+    // Second (sub-)membrane for a dual-layered look
+    const membraneOffset = -20; // pixels below main membrane
+    // use identical stroke and weight for the secondary line
+    p.strokeWeight(1.2);
+    p.stroke(...MEMBRANE_COLOR);
+    p.line(0, midY + membraneOffset, midX - outerWidth/2, midY + membraneOffset);
+    p.line(midX + outerWidth/2, midY + membraneOffset, p.width, midY + membraneOffset);
 
-    // Outer Protein Structure
+    // Outer Protein Structure (scaffold)
+    p.strokeWeight(1.5);
+    p.stroke(...OUTER_STRUCT_COLOR);
     p.ellipse(midX, topLimit, outerWidth, 30);
     p.ellipse(midX, botLimit, outerWidth, 30);
     p.line(midX - outerWidth/2, topLimit, midX - outerWidth/2, botLimit);
     p.line(midX + outerWidth/2, topLimit, midX + outerWidth/2, botLimit);
 
-    // Inner Pore Cylinder
+    // Inner Pore Cylinder (use separate pore color)
+    p.stroke(...PORE_COLOR);
     p.ellipse(midX, topLimit, currentPore, 10 * p.max(0.2, gateState)); 
     p.ellipse(midX, botLimit, currentPore, 10 * p.max(0.2, gateState));
     p.line(midX - currentPore/2, topLimit, midX - currentPore/2, botLimit);
     p.line(midX + currentPore/2, topLimit, midX + currentPore/2, botLimit);
 
     // --- LAYER 3: TOP CLOUD (Drawn last, highest Z-axis/Foreground) ---
+    p.push();
+    // ensure clouds composite on top for stronger 3D look
+    if (p.drawingContext && p.drawingContext.globalCompositeOperation) {
+      p.drawingContext.globalCompositeOperation = 'lighter';
+    }
     for (let ion of cloudIons) {
       ion.update(midX, topLimit, currentPore, gateState);
       ion.display();
@@ -79,6 +99,11 @@ window.ionChannelSketch = (p) => {
         ion.reset(); 
       }
     }
+    // restore drawing state
+    if (p.drawingContext && p.drawingContext.globalCompositeOperation) {
+      p.drawingContext.globalCompositeOperation = 'source-over';
+    }
+    p.pop();
   };
 
   class CloudIon {
@@ -103,7 +128,8 @@ window.ionChannelSketch = (p) => {
       this.noiseX += 0.007;
       this.noiseY += 0.007;
 
-      if (this.currY > myLimit - 5) this.currY = myLimit - 5;
+      // allow cloud ions to slightly overlap into the channel area
+      if (this.currY > myLimit + 6) this.currY = myLimit + 6;
       if (gState > 0.4) {
         let d = this.p.dist(this.currX, this.currY, mx, myLimit);
         if (d < 85) this.captured = true; 
@@ -111,8 +137,9 @@ window.ionChannelSketch = (p) => {
     }
     display() {
       this.p.noStroke();
-      this.p.fill(...ION_COLOR); 
-      this.p.ellipse(this.currX, this.currY, 3, 3);
+      // stronger alpha and slightly larger for visibility over the channel
+      this.p.fill(...ION_COLOR);
+      this.p.ellipse(this.currX, this.currY, ION_SIZE, ION_SIZE);
     }
   }
 
@@ -152,9 +179,11 @@ window.ionChannelSketch = (p) => {
     }
     display() {
       this.p.noStroke();
-      // this.p.fill(this.isPassed ? "rgba(180, 180, 255, 0.5)" : "rgba(255, 255, 255, 0.9)");
-      this.p.fill(this.isPassed ? "rgba(180, 180, 255, 0.5)" : "rgba(180, 180, 255, 0.5)");
-      this.p.ellipse(this.currX, this.currY, 3, 3);
+      // Use the same ion colors and a matching size to keep visual
+      // consistency between cloud ions and transit ions.
+      const fillColor = this.isPassed ? ION_FADE : ION_COLOR;
+      this.p.fill(...fillColor);
+      this.p.ellipse(this.currX, this.currY, ION_SIZE, ION_SIZE);
     }
   }
 };

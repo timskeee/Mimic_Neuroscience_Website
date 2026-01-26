@@ -2,10 +2,22 @@ window.neuronSketch = (p) => {
   // ==========================================
   // --- CONTROL PANEL ---
   // ==========================================
-  const ANIMATION_SPEED = 0.5;   // LOWER = Slower drawing; HIGHER = Faster drawing
+  const ANIMATION_SPEED = 0.80;   // LOWER = Slower drawing; HIGHER = Faster drawing
   const TIME_WINDOW_MS  = 200;   // Always spans the full 1400px
-  const CANVAS_WIDTH    = 1400;
+  const CANVAS_WIDTH    = 800;
   const CANVAS_HEIGHT   = 800;
+
+  // --- Stimulus timing (ms, relative to simulation time t) ---
+  // You can now control the overall stimulus duration with a single
+  // value `STIM_DURATION_MS`. The code will split it into two slow
+  // pulses with a small gap between them. Change `STIM_DURATION_MS`
+  // to make the stimulus window shorter or longer.
+  const STIM_START_MS = 10;                  // when stimulation begins
+  const STIM_DURATION_MS = 170;              // total stimulus duration (ms)
+  const SLOW_PULSE_GAP_MS = 20;              // gap between the two slow pulses (kept small)
+  // Derive slow pulse duration and end time from the single total duration
+  const SLOW_PULSE_DURATION_MS = Math.max(1, Math.floor((STIM_DURATION_MS - SLOW_PULSE_GAP_MS) / 2));
+  const STIM_END_MS = STIM_START_MS + STIM_DURATION_MS;
   
   // Excitability (Input Current Amps)
   let I_WT   = 10;  
@@ -55,19 +67,22 @@ window.neuronSketch = (p) => {
     // --- 1. PHYSICS LOOP ---
     // Instead of fixed loops, we calculate enough math to reach the next X position
     while (t < targetT && x < CANVAS_WIDTH) {
-      let active = (t > 10 && t < 190); 
+      let active = (t > STIM_START_MS && t < STIM_END_MS);
 
 
       V1 = calculateHH(V1, n1, m1, h1, 120, gK_WT, active ? I_WT : 0, (res) => { V1=res.V; n1=res.n; m1=res.m; h1=res.h; });
 
       // Make the red/fast trace more excitable: continuous, stronger current pulse, and higher spike amplitude
-      let fastActive = (t > 10 && t < 190);
+      let fastActive = (t > STIM_START_MS && t < STIM_END_MS);
       let I_FAST_EXCITABLE = 110; // much higher than I_WT
       let gNa_FAST_EXCITABLE = 145; // increase from 120 to 145 for taller spikes
       V2 = calculateHH(V2, n2, m2, h2, gNa_FAST_EXCITABLE, gK_FAST, fastActive ? I_FAST_EXCITABLE : 0, (res) => { V2=res.V; n2=res.n; m2=res.m; h2=res.h; });
 
       // For the blue/slow trace, give two pulses: 10-90ms and 110-190ms
-      let slowActive = (t > 10 && t < 90) || (t > 110 && t < 190);
+      let slowActive = (
+        (t > STIM_START_MS && t < STIM_START_MS + SLOW_PULSE_DURATION_MS) ||
+        (t > STIM_START_MS + SLOW_PULSE_DURATION_MS + SLOW_PULSE_GAP_MS && t < STIM_END_MS)
+      );
       V3 = calculateHH(V3, n3, m3, h3, 120, gK_SLOW, slowActive ? I_SLOW : 0, (res) => { V3=res.V; n3=res.n; m3=res.m; h3=res.h; });
 
       t += dt;
@@ -88,9 +103,10 @@ window.neuronSketch = (p) => {
     p.stroke(...cRed);   p.line(prevX, prevY2, x, y2);
     p.stroke(...cBlue);  p.line(prevX, prevY3, x, y3);
 
-    // Axis
+    // Axis (use rounded x to avoid sub-pixel antialias flicker)
     p.stroke(...cAxis);
-    p.line(0, axisY, x, axisY);
+    const axisX = Math.round(x);
+    p.line(0, axisY, axisX, axisY);
     handleFadingLabels(p, x, t);
 
     // --- 4. ADVANCE & RESET ---
@@ -136,17 +152,18 @@ window.neuronSketch = (p) => {
   function handleFadingLabels(p, currentX, currentTime) {
     // Only show labels for multiples of 25, starting at 25 (not 0)
     let rounded = Math.floor(currentTime);
-    if (rounded >= 25 && rounded % 25 === 0 && (labels.length === 0 || labels[labels.length-1].val !== rounded)) {
+    if (rounded >= 20 && rounded % 20 === 0 && (labels.length === 0 || labels[labels.length-1].val !== rounded)) {
       labels.push({ xPos: currentX, val: rounded, alpha: 0 });
     }
     for (let l of labels) {
       if (l.alpha < 255) l.alpha += 10; 
       p.stroke(255, l.alpha * 0.4);
       // Draw tick downward from axis line (at p.height - 40)
-      p.line(l.xPos, p.height - 40, l.xPos, p.height - 35);
+      const tickX = Math.round(l.xPos);
+      p.line(tickX, p.height - 40, tickX, p.height - 35);
       p.noStroke(); p.fill(179, l.alpha);
       p.textAlign(p.CENTER); p.textSize(8);
-      p.text(l.val , l.xPos, p.height - 15);
+      p.text(l.val , tickX, p.height - 15);
     }
   }
 };
