@@ -1,0 +1,39 @@
+.portalPage { position: fixed; inset: 0; padding-top: 96px; padding-left: 0; padding-right: 0; color: var(--text); overflow: hidden; z-index: 1200; }
+.outer { max-width: var(--max-width); margin: 0 auto; }
+.layoutGrid { display:grid; grid-template-columns: 320px 1fr; gap: 28px; width: 100%; padding: 0 20px; box-sizing: border-box; height: calc(100vh - 96px); }
+.title { font-size: 1.6rem; font-weight:700; margin-bottom: 8px; text-align: left }
+.select { padding: 8px 12px; border-radius:8px; border:1px solid rgba(255,255,255,0.06); background: rgba(255,255,255,0.02); color:var(--text); width:100% }
+.viewerWrap { margin-top: 6px; display:block; height: 100% }
+.viewer { background: rgba(255,255,255,0.02); padding: 18px; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.45); transition: transform 220ms ease, opacity 220ms ease; opacity:1; transform: translateY(0); }
+.viewerEmpty { color: var(--muted); padding: 28px; border-radius: 12px; background: rgba(255,255,255,0.01); }
+.viewerHeader { display:flex; align-items:center; justify-content:space-between; gap:16px }
+.mutName { margin:0; font-size:1.4rem }
+.mutMeta { color: var(--muted); font-size:0.95rem }
+.summary { color: rgba(230,238,246,0.9); margin-top: 12px }
+.block { margin-top: 14px }
+.params { background: rgba(0,0,0,0.24); padding: 10px; border-radius:8px; overflow:auto; max-width: 100%; }
+.spark { display:block }
+.sparkWrap { width: 220px }
+
+/* subtle appear animation when viewer is updated */
+.viewerUpdated { opacity:0; transform: translateY(8px); animation: fadeInUp 260ms forwards; }
+
+@keyframes fadeInUp { to { opacity:1; transform: translateY(0); } }
+
+@media (max-width: 780px){
+  .layoutGrid { grid-template-columns: 1fr; }
+  .title { font-size: 1.2rem }
+  .sparkWrap { width: 160px }
+  .leftPanel { order: -1 }
+}
+
+.leftPanel { background: rgba(255,255,255,0.01); padding: 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.03); display:flex; flex-direction:column; align-items: flex-start; gap: 8px; height: 100%; overflow: auto }
+.controlGroup { margin-top: 12px; display:flex; flex-direction:column; gap:8px; align-items: flex-start; width: 100% }
+.btnRow { display:flex; gap:10px; margin-top: 14px; width: 100% }
+.btn { padding: 8px 12px; border-radius:8px; border:none; background: var(--accent); color: #051018; font-weight:700; cursor:pointer; align-self: flex-start }
+.btn.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.06); color: var(--text) }
+.mainPanel { min-height: 340px; height: 100%; overflow: auto }
+
+/* ensure controls and labels are left aligned (scoped to left panel) */
+.leftPanel label { text-align: left }
+.leftPanel select, .leftPanel .select { text-align: left }

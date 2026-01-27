@@ -230,6 +230,19 @@ body::before {
   background: #000;
 }
 
+/* When the data portal is open, pin the site footer to the bottom of the viewport
+   so it appears below the portal content instead of floating at the top. */
+.data-portal-open .site-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 12px; /* sit just above the viewport bottom */
+  z-index: 1301;
+  background: transparent; /* let the pinned spotlight show through */
+  padding: 12px 20px; /* smaller footprint when pinned */
+  color: var(--muted);
+}
+
 /* --- 7. Responsive Design --- */
 @media (max-width: 1200px) {
   .content-row {

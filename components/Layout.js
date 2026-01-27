@@ -79,6 +79,7 @@ export default function Layout({ children }) {
           </Link>
           <nav>
             <Link href="/technology" onClick={handleLinkClick}>Technology</Link>
+            <Link href="/data-portal" onClick={handleLinkClick}>Data Portal</Link>
             <Link href="/people" onClick={handleLinkClick}>People</Link>
             <Link href="/contact" onClick={handleLinkClick}>Contact</Link>
           </nav>

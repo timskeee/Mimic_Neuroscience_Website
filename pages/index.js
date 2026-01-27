@@ -90,9 +90,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="site-footer">
-        <p>&copy; 2026 Mimic Neuroscience. All rights reserved.</p>
-      </footer>
+      {/* Footer rendered by components/Layout.js - remove duplicate here */}
 
       {/* Dynamically load p5.js and sketches */}
       {typeof window !== 'undefined' && <ClientP5Loader />}
