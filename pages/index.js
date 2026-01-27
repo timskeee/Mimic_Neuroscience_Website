@@ -102,40 +102,62 @@ export default function Home() {
 
 function ClientP5Loader() {
   useEffect(() => {
-    if (document.getElementById('p5-cdn')) return;
+    let instances = {};
 
-    const script = document.createElement('script');
-    script.id = 'p5-cdn';
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js';
+    const loadScript = (src, id) => new Promise((resolve, reject) => {
+      const existing = id ? document.getElementById(id) : null;
+      if (existing && (existing.getAttribute('data-loaded') === '1' || window.p5)) {
+        return resolve(existing);
+      }
+      if (existing && existing.getAttribute('data-loading') === '1') {
+        existing.addEventListener('load', () => resolve(existing));
+        return;
+      }
+      const s = document.createElement('script');
+      if (id) s.id = id;
+      s.src = src;
+      s.async = false;
+      s.setAttribute('data-loading', '1');
+      s.onload = () => { s.setAttribute('data-loaded', '1'); s.removeAttribute('data-loading'); resolve(s); };
+      s.onerror = reject;
+      document.body.appendChild(s);
+    });
 
-    script.onload = () => {
-      const tracesScript = document.createElement('script');
-      tracesScript.src = '/traces_sketch.js';
-      tracesScript.onload = () => {
-        if (window.p5 && window.neuronSketch) {
-          new window.p5(window.neuronSketch, 'neuron-container');
+    const ensureSketch = (sketchName, containerId) => {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const existingCanvases = container.querySelectorAll('canvas');
+      existingCanvases.forEach(c => c.remove());
+      try {
+        if (window.p5 && window[sketchName]) {
+          instances[containerId] = new window.p5(window[sketchName], containerId);
         }
-        const ionScript = document.createElement('script');
-        ionScript.src = '/ion_channel_sketch.js';
-        ionScript.onload = () => {
-          if (window.p5 && window.ionChannelSketch) {
-            new window.p5(window.ionChannelSketch, 'channel-container');
-          }
-          const networkScript = document.createElement('script');
-          networkScript.src = '/network_sketch.js';
-          networkScript.onload = () => {
-            if (window.p5 && window.networkSketch) {
-              new window.p5(window.networkSketch, 'network-canvas-container');
-            }
-          };
-          document.body.appendChild(networkScript);
-        };
-        document.body.appendChild(ionScript);
-      };
-      document.body.appendChild(tracesScript);
+      } catch (e) {
+        console.warn('p5 init failed for', sketchName, e);
+      }
     };
 
-    document.body.appendChild(script);
+    async function initAll() {
+      if (!window.p5) {
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js', 'p5-cdn');
+      }
+      await loadScript('/traces_sketch.js', 'traces-sketch');
+      await loadScript('/ion_channel_sketch.js', 'ion-sketch');
+      await loadScript('/network_sketch.js', 'network-sketch');
+
+      ensureSketch('neuronSketch', 'neuron-container');
+      ensureSketch('ionChannelSketch', 'channel-container');
+      ensureSketch('networkSketch', 'network-canvas-container');
+    }
+
+    initAll().catch(err => console.error('Failed to initialize p5 sketches', err));
+
+    return () => {
+      Object.values(instances).forEach(inst => {
+        try { inst.remove(); } catch (e) {}
+      });
+      instances = {};
+    };
   }, []);
 
   return null;
