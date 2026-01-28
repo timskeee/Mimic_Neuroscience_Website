@@ -4,6 +4,10 @@
   --accent: #00a1b7; /* Your specific Blue [0, 161, 183] */
   --text: #e6eef6;
   --muted: #9aa4b2;
+  --plot-bg: transparent;
+  --axis-color: var(--muted);
+  --grid-color: rgba(255,255,255,0.03);
+  --trace-color: #00e7ff;
   --max-width: 1400px;
 }
 

@@ -1,0 +1,46 @@
+.container {
+  display: block;
+  width: 100%;
+}
+.svg { display: block; }
+.background { fill: transparent; }
+.msg {
+  color: var(--muted,#666);
+  padding: 8px 10px;
+  font-size: 13px;
+}
+.tickLabel { fill: var(--axis-color,#666); font-size: 11px; }
+.spikes line { stroke: var(--trace-color,#1f77b4); opacity: 0.95; }
+.rows line { shape-rendering: crispEdges; }
+.plotWrap {
+  background: var(--plot-bg);
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.plot {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.axisLabel {
+  fill: var(--axis-color);
+  font-size: 12px;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+.axisTitle {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* overlay transition for compare traces/spikes */
+.overlay {
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+.overlayVisible {
+  opacity: 1;
+}

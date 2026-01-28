@@ -32,9 +32,13 @@ export default function MutationViewer({ mutation }){
 
       <div className={styles.block}>
         <strong>Files</strong>
-        <ul>
-          {mutation.files.map(f=> <li key={f}><a href={`/${f}`} target="_blank" rel="noreferrer">{f}</a></li>)}
-        </ul>
+        {Array.isArray(mutation.files) && mutation.files.length > 0 ? (
+          <ul>
+            {mutation.files.map(f=> <li key={f}><a href={`/${f}`} target="_blank" rel="noreferrer">{f}</a></li>)}
+          </ul>
+        ) : (
+          <div className={styles.muted}>No source files available for this preview.</div>
+        )}
       </div>
     </div>
   )
