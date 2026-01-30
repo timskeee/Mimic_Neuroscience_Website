@@ -9,6 +9,8 @@ export default function SpikingPlot({ src = '/data/sim1.json', width = 900, heig
   const [overlayPathState, setOverlayPathState] = useState(null)
   const [overlaySpikesState, setOverlaySpikesState] = useState([])
   const [overlayVisible, setOverlayVisible] = useState(false)
+  const [displayedBaseData, setDisplayedBaseData] = useState(null)
+  const pendingBaseRef = useRef(null)
 
   useEffect(() => {
     let mounted = true
@@ -25,6 +27,25 @@ export default function SpikingPlot({ src = '/data/sim1.json', width = 900, heig
       .catch((e) => mounted && setError(e))
     return () => (mounted = false)
   }, [src, propData])
+
+  // keep displayed base data stable while overlays are fading
+  useEffect(() => {
+    if (!data) return
+    // If a compare is being shown (adding overlay), apply the new base immediately
+    if (showCompare && compareData) {
+      setDisplayedBaseData(data)
+      pendingBaseRef.current = null
+      return
+    }
+
+    // If overlay is currently fading out, defer swapping base until fade completes
+    if (overlayPathState || (overlaySpikesState && overlaySpikesState.length)) {
+      pendingBaseRef.current = data
+    } else {
+      setDisplayedBaseData(data)
+      pendingBaseRef.current = null
+    }
+  }, [data, overlayPathState, overlaySpikesState, compareData, showCompare])
 
   // manage overlay fade-in/out when compareData changes
   useEffect(() => {
@@ -83,6 +104,11 @@ export default function SpikingPlot({ src = '/data/sim1.json', width = 900, heig
         overlayTimer.current = setTimeout(() => {
           setOverlayPathState(null)
           setOverlaySpikesState([])
+          // if a base change was deferred while overlay was visible, apply it now
+          if (pendingBaseRef.current) {
+            setDisplayedBaseData(pendingBaseRef.current)
+            pendingBaseRef.current = null
+          }
         }, 260)
       }
     }
@@ -96,13 +122,14 @@ export default function SpikingPlot({ src = '/data/sim1.json', width = 900, heig
   if (!data) return <div className={styles.msg}>Loading…</div>
 
   // If data looks like a voltage trace (times + voltages), render a trace.
-  if (data.times && data.voltages) {
-    const rawTimes = data.times
+  if ((displayedBaseData || data).times && (displayedBaseData || data).voltages) {
+    const srcBase = displayedBaseData || data
+    const rawTimes = srcBase.times
     // auto-detect units: if times appear to be in milliseconds (large values), convert to seconds
     const maxRaw = Math.max(...rawTimes)
     // if times exceed 50, assume units are milliseconds and convert to seconds
     const times = maxRaw > 50 ? rawTimes.map(t => t / 1000) : rawTimes
-    const voltages = data.voltages
+    const voltages = srcBase.voltages
     // optionally prepare compare data (e.g., mutant) for overlay
     let compTimes = null
     let compVoltages = null
@@ -164,7 +191,8 @@ export default function SpikingPlot({ src = '/data/sim1.json', width = 900, heig
 
                 {/* Draw either: (a) WT as light gray + mutant in red (when compare present), or (b) mutation only in red */}
                 {(() => {
-                  const baseIsWT = !!overlayPathState
+                  // base is WT when an overlay is present (either path or spikes) or when compareData is set
+                  const baseIsWT = Boolean(overlayPathState || (overlaySpikesState && overlaySpikesState.length) || (showCompare && compareData))
                   const baseStroke = baseIsWT ? '#e6e6e6' : compareColor
                   const baseWidth = baseIsWT ? 1.2 : 1.8
                   return <path d={path} fill="none" stroke={baseStroke} strokeWidth={baseWidth} strokeLinecap="round" strokeLinejoin="round" />
@@ -190,7 +218,8 @@ export default function SpikingPlot({ src = '/data/sim1.json', width = 900, heig
   }
 
   // Otherwise, treat as spike/raster data
-  const spikeArrayRaw = Array.isArray(data) ? data : data.spikes || []
+  const baseForRaster = displayedBaseData || data
+  const spikeArrayRaw = Array.isArray(baseForRaster) ? baseForRaster : baseForRaster.spikes || []
   // copy & convert spike times if they appear to be in milliseconds
   const maxSpikeTime = spikeArrayRaw.reduce((m, s) => Math.max(m, (s && s.time) || 0), 0)
   const spikeArray = maxSpikeTime > 50 ? spikeArrayRaw.map(s => ({ ...s, time: (s.time || 0) / 1000 })) : spikeArrayRaw
@@ -251,7 +280,8 @@ export default function SpikingPlot({ src = '/data/sim1.json', width = 900, heig
         {/* draw base spikes first (WT or mutation), then overlay spikes when compare provided */}
         <g className={styles.spikes}>
           {(() => {
-            const hasOverlay = overlaySpikesState && overlaySpikesState.length > 0
+            // base is WT when an overlay is present (either path or spikes) or when compareData is set
+            const hasOverlay = Boolean(overlayPathState || (overlaySpikesState && overlaySpikesState.length) || (showCompare && compareData))
             const baseColor = hasOverlay ? '#e6e6e6' : compareColor
             return spikeArray.map((s, i) => {
               const cx = xFor(s.time || 0)

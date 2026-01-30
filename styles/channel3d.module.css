@@ -1,0 +1,42 @@
+.wrap {
+  display: block;
+  border-radius: 8px;
+  overflow: hidden;
+  background: transparent;
+}
+.mount {
+  width: 100%;
+  height: 100%;
+}
+.muted {
+  color: var(--muted,#666);
+  padding: 12px;
+  font-size: 13px;
+}
+
+.controls {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 20;
+}
+.button {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid rgba(102,102,102,0.22);
+  background: transparent;
+  color: #666666;
+  cursor: pointer;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.button:active {
+  transform: translateY(1px);
+}

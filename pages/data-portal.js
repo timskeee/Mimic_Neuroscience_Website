@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import MutationViewer from '../components/MutationViewer'
 import SpikingPlot from '../components/SpikingPlot'
+import Channel3D from '../components/Channel3D'
 import styles from '../styles/dataPortal.module.css'
 
 export default function DataPortal(){
@@ -139,6 +140,10 @@ export default function DataPortal(){
           <div className={styles.viewerWrap}>
             {loading && <div className="muted">Loading mutation...</div>}
             <MutationViewer mutation={mutation} />
+            {/* Channel 3D viewer (rotatable, zoomable) */}
+            <div style={{marginBottom:12}}>
+              <Channel3D width={960} height={720} mutationPosition={mutation?.previewData?.metadata?.mutationPosition || mutation?.parameters?.mutationPosition || null} />
+            </div>
             {/* Example spiking plot (uses precomputed preview JSON) */}
             <div style={{marginTop:18}}>
               {(() => {
